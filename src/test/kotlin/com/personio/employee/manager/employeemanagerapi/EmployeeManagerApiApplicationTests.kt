@@ -1,0 +1,16 @@
+package com.personio.employee.manager.employeemanagerapi
+
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.junit4.SpringRunner
+
+@RunWith(SpringRunner::class)
+@SpringBootTest
+class EmployeeManagerApiApplicationTests {
+
+	@Test
+	fun contextLoads() {
+	}
+
+}
