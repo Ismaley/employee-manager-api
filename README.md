@@ -1,2 +1,2 @@
-# employee-manager-api
-a simple employee manager api
+# employee-api
+a simple employee management api
