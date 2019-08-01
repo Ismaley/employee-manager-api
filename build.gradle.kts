@@ -6,6 +6,7 @@ plugins {
 	id("io.spring.dependency-management") version "1.0.7.RELEASE"
 	kotlin("jvm") version "1.2.71"
 	kotlin("plugin.spring") version "1.2.71"
+	id("com.github.johnrengelman.shadow") version "5.1.0"
 }
 
 group = "com.personio.employee.manager"
@@ -20,6 +21,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+	implementation( "com.h2database", "h2", "1.4.199")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
