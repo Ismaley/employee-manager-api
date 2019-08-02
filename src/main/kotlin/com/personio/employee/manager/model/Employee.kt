@@ -7,6 +7,7 @@ import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.JoinTable
+import javax.persistence.ManyToOne
 import javax.persistence.OneToMany
 
 @Entity
@@ -21,4 +22,8 @@ data class Employee(
     @JoinTable(name="subordinates")
     @OneToMany(fetch = FetchType.EAGER)
     val subordinates: List<Employee>? = emptyList()
+
+//    @JoinTable(name = "supervisor")
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    val supervisor: Employee? = null
 )

@@ -1,7 +1,7 @@
-package com.personio.employee.manager
+package com.personio.employee.manager.repository
 
+import com.personio.employee.manager.EmployeeManagerApiApplication
 import com.personio.employee.manager.model.Employee
-import com.personio.employee.manager.repository.EmployeeRepository
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -38,6 +38,25 @@ class RepositoriesTest {
         }
 
         println(hierarchy)
+
     }
+
+//    @Test
+//    fun shouldPersist() {
+//        val jonas = employeeRepository.save(Employee(name ="Jonas"))
+//        val sophie = employeeRepository.save(Employee(name = "Sophie", supervisor = jonas))
+//        val nick = employeeRepository.save(Employee(name = "Nick", supervisor = sophie))
+//        val pete = employeeRepository.save(Employee(name = "Pete", supervisor = nick))
+//        val barbara = employeeRepository.save(Employee(name = "Barbara", supervisor = nick))
+//
+//
+//        employeeRepository.findAll().forEach {
+//            println(it)
+//        }
+//
+
+
+//    }
+
 
 }
