@@ -12,7 +12,7 @@ import org.springframework.util.LinkedMultiValueMap
 @Service
 class EmployeeService(private val employeeRepository: EmployeeRepository) {
 
-    fun addEmployeeHierarchy(employees: Map<String, String>): Map<String, Map<String, Any>> {
+    fun createEmployeeHierarchy(employees: Map<String, String>): Map<String, Map<String, Any>> {
         val unsortedHierarchy = LinkedMultiValueMap<String, String>()
         val supervisors = mutableListOf<String>()
         val subordinates = mutableListOf<String>()

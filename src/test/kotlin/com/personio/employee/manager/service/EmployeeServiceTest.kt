@@ -38,7 +38,7 @@ class EmployeeServiceTest {
         every { employeeRepository.save(expectedBoss) } returns expectedBoss
         every { employeeRepository.deleteAll() } answers {}
 
-        val hierarchy = employeeService.addEmployeeHierarchy(employees)
+        val hierarchy = employeeService.createEmployeeHierarchy(employees)
 
         verify(exactly = 1) { employeeRepository.deleteAll() }
         verify(exactly = 1) { employeeRepository.save(expectedBoss) }
@@ -61,7 +61,7 @@ class EmployeeServiceTest {
         every { employeeRepository.save(expectedBoss) } returns expectedBoss
         every { employeeRepository.deleteAll() } answers {}
 
-        val hierarchy = employeeService.addEmployeeHierarchy(employees)
+        val hierarchy = employeeService.createEmployeeHierarchy(employees)
 
         verify(exactly = 1) { employeeRepository.deleteAll() }
         verify(exactly = 1) { employeeRepository.save(expectedBoss) }
@@ -84,7 +84,7 @@ class EmployeeServiceTest {
         expectedEx.expect(EmployeeServiceException::class.java)
         expectedEx.expectMessage(ErrorMessages.INVALID_HIERARCHY_CYCLIC)
 
-        employeeService.addEmployeeHierarchy(employees)
+        employeeService.createEmployeeHierarchy(employees)
     }
 
     @Test
@@ -103,7 +103,7 @@ class EmployeeServiceTest {
         expectedEx.expect(EmployeeServiceException::class.java)
         expectedEx.expectMessage(ErrorMessages.INVALID_HIERARCHY_MULTIPLE_BOSSES)
 
-        employeeService.addEmployeeHierarchy(employees)
+        employeeService.createEmployeeHierarchy(employees)
     }
 
     @Test
@@ -121,7 +121,7 @@ class EmployeeServiceTest {
         expectedEx.expect(EmployeeServiceException::class.java)
         expectedEx.expectMessage(ErrorMessages.INVALID_HIERARCHY_MISSING_RELATION)
 
-        employeeService.addEmployeeHierarchy(employees)
+        employeeService.createEmployeeHierarchy(employees)
     }
 
     @Test
@@ -134,7 +134,7 @@ class EmployeeServiceTest {
         expectedEx.expect(EmployeeServiceException::class.java)
         expectedEx.expectMessage(ErrorMessages.INVALID_HIERARCHY_EMPTY)
 
-        employeeService.addEmployeeHierarchy(employees)
+        employeeService.createEmployeeHierarchy(employees)
     }
 
     @Test
