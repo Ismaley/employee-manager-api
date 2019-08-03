@@ -2,6 +2,8 @@ package com.personio.employee.manager.service
 
 import com.personio.employee.manager.exception.EmployeeServiceException
 import com.personio.employee.manager.exception.ErrorMessages
+import com.personio.employee.manager.exception.NotFoundException
+import com.personio.employee.manager.extensions.asMap
 import com.personio.employee.manager.model.Employee
 import com.personio.employee.manager.repository.EmployeeRepository
 import org.springframework.stereotype.Service
@@ -10,7 +12,7 @@ import org.springframework.util.LinkedMultiValueMap
 @Service
 class EmployeeService(private val employeeRepository: EmployeeRepository) {
 
-    fun addEmployeeHierarchy(employees: Map<String, String>) : Map<String, Map<String, Any>> {
+    fun addEmployeeHierarchy(employees: Map<String, String>): Map<String, Map<String, Any>> {
         val unsortedHierarchy = LinkedMultiValueMap<String, String>()
         val supervisors = mutableListOf<String>()
         val subordinates = mutableListOf<String>()
@@ -31,6 +33,11 @@ class EmployeeService(private val employeeRepository: EmployeeRepository) {
         return employeeRepository.save(employee).asMap()
     }
 
+    fun findEmployeeByName(employeeName: String): Map<String, Map<String, Any>> {
+        validateName(employeeName)
+        return employeeRepository.findByName(employeeName)?.asMap() ?: throw NotFoundException(ErrorMessages.notFoundError(employeeName))
+    }
+
     private fun traverseHierarchy(hierarchy: Map<String, List<String>>, start: String): Employee {
         return Employee(name = start, subordinates = getEmployees(hierarchy, start))
     }
@@ -40,29 +47,23 @@ class EmployeeService(private val employeeRepository: EmployeeRepository) {
         return employees.map { traverseHierarchy(hierarchy, it) }
     }
 
-    private fun Employee.asMap(): Map<String, Map<String, Any>> {
-        return mapOf(this.name!! to this.subordinates!!.asMap())
-    }
 
-    fun List<Employee>.asMap(): Map<String, Map<String, Any>> {
-        val myMap: MutableMap<String, Map<String, Any>> = mutableMapOf()
-
-        this.forEach { employee ->
-            myMap[employee.name!!] = employee.subordinates!!.asMap()
-        }
-
-        return myMap
-    }
 
     private fun validateEmployeeSupervisorRelation(supervisor: String) {
-        if(supervisor.isBlank()) {
+        if (supervisor.isBlank()) {
             throw EmployeeServiceException(ErrorMessages.INVALID_HIERARCHY_MISSING_RELATION)
         }
     }
 
     private fun validateNonEmpty(employees: Map<String, String>) {
-        if(employees.isEmpty()) {
+        if (employees.isEmpty()) {
             throw EmployeeServiceException(ErrorMessages.INVALID_HIERARCHY_EMPTY)
+        }
+    }
+
+    private fun validateName(name: String) {
+        if (name.isBlank()) {
+            throw EmployeeServiceException(ErrorMessages.EMPTY_NAME)
         }
     }
 

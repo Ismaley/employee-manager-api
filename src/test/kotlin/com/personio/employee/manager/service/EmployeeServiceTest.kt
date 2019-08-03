@@ -2,13 +2,12 @@ package com.personio.employee.manager.service
 
 import com.personio.employee.manager.exception.EmployeeServiceException
 import com.personio.employee.manager.exception.ErrorMessages
+import com.personio.employee.manager.exception.NotFoundException
+import com.personio.employee.manager.extensions.asMap
 import com.personio.employee.manager.model.Employee
 import com.personio.employee.manager.repository.EmployeeRepository
-import io.mockk.Call
-import io.mockk.Called
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.mockkClass
 import io.mockk.verify
 import org.junit.Assert
 import org.junit.Rule
@@ -20,7 +19,8 @@ class EmployeeServiceTest {
     private val employeeRepository = mockk<EmployeeRepository>()
     private val employeeService = EmployeeService(employeeRepository)
 
-    @Rule @JvmField
+    @Rule
+    @JvmField
     var expectedEx: ExpectedException = ExpectedException.none()
 
     @Test
@@ -136,6 +136,51 @@ class EmployeeServiceTest {
 
         employeeService.addEmployeeHierarchy(employees)
     }
+
+    @Test
+    fun `should find employee by name`() {
+        val employeeName = "Nick"
+        val expectedEmployee = buildExpectedEmployee(employeeName)
+
+        every { employeeRepository.findByName(employeeName) } returns expectedEmployee
+
+        val foundEmployee = employeeService.findEmployeeByName(employeeName)
+
+        verify(exactly = 1) { employeeRepository.findByName(employeeName) }
+
+        Assert.assertEquals(expectedEmployee.asMap(), foundEmployee)
+    }
+
+    @Test
+    fun `should not find employee if it not exists`() {
+        val employeeName = "Nick"
+
+        every { employeeRepository.findByName(employeeName) } returns null
+
+        expectedEx.expect(NotFoundException::class.java)
+        expectedEx.expectMessage(ErrorMessages.notFoundError(employeeName))
+
+        employeeService.findEmployeeByName(employeeName)
+    }
+
+    @Test
+    fun `should not find employee if input is empty`() {
+        val employeeName = ""
+
+        expectedEx.expect(EmployeeServiceException::class.java)
+        expectedEx.expectMessage(ErrorMessages.EMPTY_NAME)
+
+        verify(exactly = 0) { employeeRepository.findByName(any()) }
+
+        employeeService.findEmployeeByName(employeeName)
+    }
+
+    private fun buildExpectedEmployee(employeeName: String): Employee =
+        Employee(
+            name = employeeName, subordinates = listOf(
+                Employee(name = "Pete"), Employee(name = "Barbara")
+            )
+        )
 
 
     private fun buildExpectedBoss(): Employee =
