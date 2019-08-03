@@ -1,5 +1,7 @@
 package com.personio.employee.manager.model
 
+import org.hibernate.annotations.Cascade
+import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.FetchType
@@ -20,7 +22,7 @@ data class Employee(
     val name: String? = null,
 
     @JoinTable(name="subordinates")
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.PERSIST])
     val subordinates: List<Employee>? = emptyList()
 
 //    @JoinTable(name = "supervisor")
