@@ -21,9 +21,9 @@ class EmployeeController(private val employeeService: EmployeeService) {
     fun createHierarchy(@RequestBody employees: Map<String, String>): Map<String, Map<String, Any>> =
         employeeService.createEmployeeHierarchy(employees)
 
-    @GetMapping
+    @GetMapping("/supervisors")
     @ResponseBody
-    fun findEmployee(@RequestParam employeeName: String): Map<String, Map<String, Any>> =
-        employeeService.findEmployeeByName(employeeName)
+    fun findEmployeeSupervisors(@RequestParam employeeName: String): Map<String, String> =
+        employeeService.findEmployeeSupervisors(employeeName)
 
 }

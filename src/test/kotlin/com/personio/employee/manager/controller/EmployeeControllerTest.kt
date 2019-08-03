@@ -79,7 +79,7 @@ class EmployeeControllerTest {
     }
 
     @Test
-    fun `should successfully find an employee by name along with it's hierarchy`() {
+    fun `should successfully find an employee's supervisors`() {
         val employees = mapper.writeValueAsString(mapOf(
             "Pete" to "Nick",
             "Barbara" to "Nick",
@@ -87,14 +87,11 @@ class EmployeeControllerTest {
             "Sophie" to "Jonas"
         ))
 
-        val expectedHierarchy = mapOf<String, Map<String, Any>>(
-                "Sophie" to mapOf<String, Map<String, Any>>(
-                    "Nick" to mapOf<String, Map<String, Any>>(
-                        "Pete" to emptyMap(),
-                        "Barbara" to emptyMap()
-                    )
-                )
-        )
+        val expectedHierarchy = mapper.writeValueAsString(mapOf(
+            "Barbara" to "Nick",
+            "Nick" to "Sophie",
+            "Sophie" to "Jonas"
+        ))
 
         mockMvc.perform(post(employeesResource)
             .accept(MediaType.APPLICATION_JSON)
@@ -102,12 +99,12 @@ class EmployeeControllerTest {
             .content(employees))
             .andExpect(status().isCreated)
 
-        mockMvc.perform(get(employeesResource)
+        mockMvc.perform(get("$employeesResource/supervisors")
             .accept(MediaType.APPLICATION_JSON)
             .contentType(MediaType.APPLICATION_JSON)
-            .param("employeeName", "Sophie"))
+            .param("employeeName", "Barbara"))
             .andExpect(status().isOk)
-            .andExpect(content().string(mapper.writeValueAsString(expectedHierarchy)))
+            .andExpect(content().string(expectedHierarchy))
             .andDo(MockMvcResultHandlers.print())
     }
 
@@ -127,7 +124,7 @@ class EmployeeControllerTest {
             .content(employees))
             .andExpect(status().isCreated)
 
-        mockMvc.perform(get(employeesResource)
+        mockMvc.perform(get("$employeesResource/supervisors")
             .accept(MediaType.APPLICATION_JSON)
             .contentType(MediaType.APPLICATION_JSON)
             .param("employeeName", ""))
@@ -153,7 +150,7 @@ class EmployeeControllerTest {
             .content(employees))
             .andExpect(status().isCreated)
 
-        mockMvc.perform(get(employeesResource)
+        mockMvc.perform(get("$employeesResource/supervisors")
             .accept(MediaType.APPLICATION_JSON)
             .contentType(MediaType.APPLICATION_JSON)
             .param("employeeName", notFoundEmployeeName))

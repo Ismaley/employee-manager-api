@@ -138,21 +138,50 @@ class EmployeeServiceTest {
     }
 
     @Test
-    fun `should find employee by name`() {
-        val employeeName = "Nick"
-        val expectedEmployee = buildExpectedEmployee(employeeName)
+    fun `should find employee's supervisors`() {
+        val barbara = Employee(name = "Barbara")
+        val nick = Employee(name = "Nick", subordinates = listOf(barbara))
+        val sophie = Employee(name = "Sophie", subordinates = listOf(nick))
+        val jonas = Employee(name = "Jonas", subordinates = listOf(sophie))
 
-        every { employeeRepository.findByName(employeeName) } returns expectedEmployee
+        val expectedSupervisorsMap = mapOf(barbara.name!! to nick.name!!,
+            nick.name!! to sophie.name!!,
+            sophie.name!! to jonas.name!!)
 
-        val foundEmployee = employeeService.findEmployeeByName(employeeName)
+        every { employeeRepository.findByName(barbara.name!!) } returns barbara
+        every { employeeRepository.findSupervisor(barbara.name!!) } returns nick
+        every { employeeRepository.findSupervisor(nick.name!!) } returns sophie
+        every { employeeRepository.findSupervisor(sophie.name!!) } returns jonas
+        every { employeeRepository.findSupervisor(jonas.name!!) } returns null
 
-        verify(exactly = 1) { employeeRepository.findByName(employeeName) }
+        val supervisors = employeeService.findEmployeeSupervisors(barbara.name!!)
 
-        Assert.assertEquals(expectedEmployee.asMap(), foundEmployee)
+        verify(exactly = 1) { employeeRepository.findByName(barbara.name!!) }
+        verify(exactly = 1) { employeeRepository.findSupervisor(barbara.name!!) }
+        verify(exactly = 1) { employeeRepository.findSupervisor(nick.name!!) }
+        verify(exactly = 1) { employeeRepository.findSupervisor(sophie.name!!) }
+        verify(exactly = 1) { employeeRepository.findSupervisor(jonas.name!!) }
+
+        Assert.assertEquals(expectedSupervisorsMap, supervisors)
     }
 
     @Test
-    fun `should not find employee if it not exists`() {
+    fun `should return no supervisors if given employee is the boss`() {
+        val jonas = Employee(name = "Jonas")
+
+        every { employeeRepository.findByName(jonas.name!!) } returns jonas
+        every { employeeRepository.findSupervisor(jonas.name!!) } returns null
+
+        val supervisors = employeeService.findEmployeeSupervisors(jonas.name!!)
+
+        verify(exactly = 1) { employeeRepository.findByName(jonas.name!!) }
+        verify(exactly = 1) { employeeRepository.findSupervisor(jonas.name!!) }
+
+        Assert.assertEquals(0, supervisors.size)
+    }
+
+    @Test
+    fun `should not find employee supervisors if it not exists`() {
         val employeeName = "Nick"
 
         every { employeeRepository.findByName(employeeName) } returns null
@@ -160,27 +189,10 @@ class EmployeeServiceTest {
         expectedEx.expect(NotFoundException::class.java)
         expectedEx.expectMessage(ErrorMessages.notFoundError(employeeName))
 
-        employeeService.findEmployeeByName(employeeName)
+        employeeService.findEmployeeSupervisors(employeeName)
+
+        verify(exactly = 1) { employeeRepository.findByName(employeeName) }
     }
-
-    @Test
-    fun `should not find employee if input is empty`() {
-        val employeeName = ""
-
-        expectedEx.expect(EmployeeServiceException::class.java)
-        expectedEx.expectMessage(ErrorMessages.EMPTY_NAME)
-
-        verify(exactly = 0) { employeeRepository.findByName(any()) }
-
-        employeeService.findEmployeeByName(employeeName)
-    }
-
-    private fun buildExpectedEmployee(employeeName: String): Employee =
-        Employee(
-            name = employeeName, subordinates = listOf(
-                Employee(name = "Pete"), Employee(name = "Barbara")
-            )
-        )
 
 
     private fun buildExpectedBoss(): Employee =

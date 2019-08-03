@@ -33,9 +33,14 @@ class EmployeeService(private val employeeRepository: EmployeeRepository) {
         return employeeRepository.save(employee).asMap()
     }
 
-    fun findEmployeeByName(employeeName: String): Map<String, Map<String, Any>> {
+    fun findEmployeeSupervisors(employeeName: String): Map<String, String> {
         validateName(employeeName)
-        return employeeRepository.findByName(employeeName)?.asMap() ?: throw NotFoundException(ErrorMessages.notFoundError(employeeName))
+        val foundEmployee = employeeRepository.findByName(employeeName) ?: throw NotFoundException(
+            ErrorMessages.notFoundError(employeeName)
+        )
+        val supervisors = mutableMapOf<String, String>()
+        findSupervisors(foundEmployee.name!!, supervisors)
+        return supervisors
     }
 
     private fun traverseHierarchy(hierarchy: Map<String, List<String>>, start: String): Employee {
@@ -46,8 +51,6 @@ class EmployeeService(private val employeeRepository: EmployeeRepository) {
         val employees = hierarchy[boss] ?: emptyList()
         return employees.map { traverseHierarchy(hierarchy, it) }
     }
-
-
 
     private fun validateEmployeeSupervisorRelation(supervisor: String) {
         if (supervisor.isBlank()) {
@@ -74,6 +77,12 @@ class EmployeeService(private val employeeRepository: EmployeeRepository) {
             bosses.size > 1 -> throw EmployeeServiceException(ErrorMessages.INVALID_HIERARCHY_MULTIPLE_BOSSES)
             else -> bosses.first()
         }
+    }
+
+    private tailrec fun findSupervisors(name: String, hierarchy: MutableMap<String, String>) {
+        val supervisor = employeeRepository.findSupervisor(name) ?: return
+        hierarchy.putIfAbsent(name, supervisor.name!!)
+        findSupervisors(supervisor.name, hierarchy)
     }
 
 }

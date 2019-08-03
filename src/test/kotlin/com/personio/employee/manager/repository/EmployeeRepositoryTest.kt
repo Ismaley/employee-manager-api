@@ -17,7 +17,7 @@ class EmployeeRepositoryTest {
     private lateinit var employeeRepository: EmployeeRepository
 
     @Test
-    fun shouldPersistEmployeeWithCascade() {
+    fun `should persist employees and their subordinates`() {
         val pete = Employee(name = "Pete")
         val barbara = Employee(name = "Barbara")
 
@@ -31,5 +31,28 @@ class EmployeeRepositoryTest {
         Assert.assertEquals(2, nick.subordinates!!.size)
         Assert.assertNotNull(nick.subordinates!![1].id)
         Assert.assertEquals("Barbara", nick.subordinates!![1].name)
+    }
+
+    @Test
+    fun `should find supervisor`() {
+
+         employeeRepository.save(Employee(name = "Jonas", subordinates = listOf(
+            Employee(name = "Sophie", subordinates = listOf()))))
+
+        val supervisor = employeeRepository.findSupervisor("Sophie")
+
+        Assert.assertNotNull(supervisor)
+        Assert.assertEquals("Jonas", supervisor!!.name)
+    }
+
+    @Test
+    fun `should not find supervisor if it's the boss`() {
+
+        employeeRepository.save(Employee(name = "Jonas", subordinates = listOf(
+            Employee(name = "Sophie", subordinates = listOf()))))
+
+        val supervisor = employeeRepository.findSupervisor("Jonas")
+
+        Assert.assertNull(supervisor)
     }
 }
