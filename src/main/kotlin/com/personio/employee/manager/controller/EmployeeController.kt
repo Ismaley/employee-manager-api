@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.ResponseStatus
 
 @Controller
-@RequestMapping("/employees")
+@RequestMapping("/api/employees")
 class EmployeeController(private val employeeService: EmployeeService) {
 
     @PostMapping

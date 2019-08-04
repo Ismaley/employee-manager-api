@@ -20,11 +20,14 @@ repositories {
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
-	implementation("org.jetbrains.kotlin:kotlin-reflect")
+	implementation("org.springframework.boot:spring-boot-starter-security")
+	implementation("org.springframework.security:spring-security-test")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	implementation( "com.h2database", "h2", "1.4.199")
 	implementation( "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.8")
+	testImplementation("org.springframework.security:spring-security-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.jetbrains.kotlin:kotlin-reflect")
 	testImplementation("io.mockk:mockk:1.9.3")
 }
 

@@ -23,7 +23,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPat
 @AutoConfigureMockMvc
 class EmployeeControllerTest {
 
-    private val employeesResource = "/employees"
+    private val employeesResource = "/api/employees"
     private val mapper = ObjectMapper()
 
     @Autowired
